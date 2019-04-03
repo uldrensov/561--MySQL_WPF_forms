@@ -1,0 +1,17 @@
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\bin\Debug\COMPE561 Lab05.exe.config
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\bin\Debug\COMPE561 Lab05.exe
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\bin\Debug\COMPE561 Lab05.pdb
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\bin\Debug\MySql.Data.dll
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\bin\Debug\Google.Protobuf.dll
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\bin\Debug\MySql.Data.xml
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561 Lab05.csprojAssemblyReference.cache
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561_Lab05.bookForm.resources
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561_Lab05.customerForm.resources
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561_Lab05.Form1.resources
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561_Lab05.orderForm.resources
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561_Lab05.Properties.Resources.resources
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561 Lab05.csproj.GenerateResource.cache
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561 Lab05.csproj.CoreCompileInputs.cache
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561 Lab05.csproj.CopyComplete
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561 Lab05.exe
+C:\Users\Cliff\source\repos\COMPE561 Lab05\COMPE561 Lab05\obj\Debug\COMPE561 Lab05.pdb
