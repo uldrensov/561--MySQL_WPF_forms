@@ -8,15 +8,17 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using MySql.Data.MySqlClient;
+using System.IO;
 
 namespace COMPE561_Lab05
 {
     public partial class orderForm : Form
     {
         const string connection_keycard = "datasource=127.0.0.1;port=3306;username=root;password=;database=lab5"; //"key" to the database
+        const string dest_name = "ordersumary.txt"; //receipt file name
         const int timelim = 30; //command timeout time limit (seconds)
         const int idlength = 10; //order id length
-        const double taxratio = 0.1; //tax multiplier
+        const double taxratio = 10; //tax multiplier (percent)
 
         //instantiate a datatable for the datagridview element
         DataTable dt = new DataTable();
@@ -37,7 +39,20 @@ namespace COMPE561_Lab05
             isbnbox.Enabled = false;
             pricebox.Enabled = false;
 
-            //clean the slate
+            //set up the columns of the datatable
+            dt.Columns.AddRange(new DataColumn[4]
+            {
+                new DataColumn("Title", typeof(string)),
+                new DataColumn("Price($)", typeof(string)),
+                new DataColumn("Quantity", typeof(string)),
+                new DataColumn("Line total($)", typeof(string))
+            }
+            );
+
+            //set the datatable as the source for the datagridview
+            maingrid.DataSource = dt;
+
+            //clean the form
             reset();
         }
 
@@ -48,24 +63,154 @@ namespace COMPE561_Lab05
         }
 
 
-        //
+        //add button: adds a row entry to the datatable based on the currently selected book and an entered quantity
         private void addbutton_Click(object sender, EventArgs e)
         {
+            //if a book is selected from the combo box, proceed
+            if (!(bookselDropdown.SelectedItem is null))
+            {
+                //obtain the currently selected book object
+                book selected_book = bookselDropdown.SelectedItem as book;
 
+                //proceed if the quantity input is valid
+                if (int.TryParse(qtybox.Text, out int quantity))
+                {
+                    //proceed if the quantity entered is nonzero
+                    if (quantity != 0)
+                    {
+                        //calculate line price, add a row to the datatable, and clear the quantity textbox
+                        double lineprice = Convert.ToDouble(selected_book.price) * quantity;
+                        dt.Rows.Add(selected_book.title, selected_book.price, quantity.ToString(), lineprice.ToString());
+                        qtybox.Text = null;
+                    }
+
+                    else
+                    {
+                        MessageBox.Show("Please enter a nonzero quantity.");
+                        qtybox.Focus();
+                    }
+                }
+
+                else
+                {
+                    MessageBox.Show("Please enter a valid quantity.");
+                    qtybox.Focus();
+                }
+            }
+
+            else
+            {
+                MessageBox.Show("Please select a book.");
+                bookselDropdown.Focus();
+            }
         }
 
 
-        //
+        //confirm button: calculates final costs, writes to the database, and (optionally) writes a receipt .txt document
         private void confirmbutton_Click(object sender, EventArgs e)
         {
+            try
+            {
+                //this if-statement simply serves to check if any cells exist
+                //the if-check logic itself will never fail because the program will instead throw an exception if the cell doesn't exist
+                if (!(dt.Rows[0][0] is null))
+                {
+                    //ensure a customer is selected to place the order
+                    if (!(custselDropdown.SelectedItem is null))
+                    {
+                        //set up a yes-no dialogue prompt, and proceed only if "Yes" is chosen
+                        DialogResult choice1 = MessageBox.Show("Confirm order?", "", MessageBoxButtons.YesNo);
+                        if (choice1 == DialogResult.Yes)
+                        {
+                            double subtotal = 0; //running total for subtotal calculation
+                            int count = dt.Rows.Count; //total number of entries added to datatable
+                            string ordercode = gen_id(); //this order's unique id
 
+                            //sum up the prices of all items in the datatable
+                            for (int i = 0; i < count; i++)
+                            {
+                                double rowprice = Convert.ToDouble(dt.Rows[i][3]);
+                                subtotal += rowprice;
+                            }
+
+                            //calculate tax and total
+                            double tax = (Math.Ceiling(subtotal * taxratio) / 100.0); //rounds up to 2 decimal places by dividing a whole number by 100
+                            double total = subtotal + tax;
+
+                            //display all costs in their relevant textboxes
+                            subtotalbox.Text = $"${subtotal}";
+                            taxbox.Text = $"${tax}";
+                            totalbox.Text = $"${total}";
+
+                            //create a connection "portal" to the database using the "keycard" string
+                            MySqlConnection dbPortal = new MySqlConnection(connection_keycard);
+
+                            //TODO
+                            //create a command object using the "portal" object, and a SQL query that inserts a row of data into the database's "orders" table
+                            string query1 = "INSERT INTO orders(order_id, cust_id, subtotal, tax, total, date) " +
+                                $"VALUES('{ordercode}', '{idbox.Text}', )";
+                            MySqlCommand command1 = new MySqlCommand(query1, dbPortal);
+                            command1.CommandTimeout = timelim; //ensure the command doesn't take too long
+
+                            //TODO
+                            //create a second command object with a SQL query that inserts a row of data into the database's "order_details" table
+                            string query2 = "INSERT INTO order_details(order_id, isbn, qty, line_total) " +
+                                $"VALUES('{ordercode}', '{isbnbox.Text}', )";
+
+
+
+
+
+                            //confirm success and ask if a receipt is desired
+                            MessageBox.Show("Order successfully placed!");
+                            DialogResult choice2 = MessageBox.Show("Would you like to print a receipt?", "Print order summary", MessageBoxButtons.YesNo);
+
+                            //write an order summary to a .txt file if the user wishes
+                            if (choice2 == DialogResult.Yes)
+                            {
+                                try
+                                {
+                                    FileStream destination = new FileStream(dest_name, FileMode.Create, FileAccess.Write);
+                                    StreamWriter print_tool = new StreamWriter(destination);
+
+                                    //TODO
+                                    print_tool.WriteLine($"*******END OF ORDER SUMMARY*******");
+
+                                    print_tool.Close();
+                                    destination.Close();
+                                    MessageBox.Show("Receipt successfully created.");
+                                }
+
+                                catch (Exception err)
+                                {
+                                    MessageBox.Show($"ERROR: {err.Message}");
+                                    MessageBox.Show("Failed to print receipt. Please contact the administrator.");
+                                }
+                            }
+                        }
+                    }
+
+                    else
+                    {
+                        MessageBox.Show("Please select customer name.");
+                        custselDropdown.Focus();
+                    }    
+                }
+            }
+
+            catch (IndexOutOfRangeException err)
+            {
+                MessageBox.Show($"ERROR: {err.Message}");
+                MessageBox.Show("Failed to record checkout details. Please contact the administrator.");
+            }
         }
 
 
-        //
+        //cancel button: allows the user to reset the form
         private void cancelbutton_Click(object sender, EventArgs e)
         {
-
+            DialogResult choice = MessageBox.Show("Are you sure you want to cancel your current order?", "Cancel order", MessageBoxButtons.YesNo);
+            if (choice == DialogResult.Yes) reset();
         }
 
 
@@ -108,7 +253,7 @@ namespace COMPE561_Lab05
         }
 
 
-        //instantiates customer objects and wires them to the combo box
+        //reads from the database, instantiates customer objects, and wires them to the combo box
         private void populateDropdown1()
         {
             //create a list to contain customer objects read from the database
@@ -152,7 +297,7 @@ namespace COMPE561_Lab05
         }
 
 
-        //instantiates book objects and wires them to the combo box
+        //reads from the database, instantiates book objects, and wires them to the combo box
         private void populateDropdown2()
         {
             //create a list to contain book objects read from the database
@@ -243,6 +388,6 @@ namespace COMPE561_Lab05
     }
 }
 
-//TODO: copypasta some of the old code base
-//add database functionalities...reads customer names into combobox, reads title into combobox and populates boxes, writes results to a table
+//TODO: generate or get date
+//finish database-write functionality (the second database table accounts for each row in the shopping cart)
 //EC: write order summary to notepad

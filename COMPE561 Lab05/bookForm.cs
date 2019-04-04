@@ -11,7 +11,7 @@ using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 
 /// <summary>
-/// TODO: data table specifications go here
+/// TODO: data table specifications go here (and other 2 forms)
 /// </summary>
 namespace COMPE561_Lab05
 {
@@ -54,16 +54,19 @@ namespace COMPE561_Lab05
             if (!RX1.IsMatch(authorBox.Text))
             {
                 MessageBox.Show("Please enter a valid author name. Only alphabetical characters permitted.");
+                authorBox.Focus();
                 perfectInput = false;
             }
             else if (!RX2.IsMatch(isbnBox.Text))
             {
                 MessageBox.Show("Please enter a valid 5-digit ISBN.");
+                isbnBox.Focus();
                 perfectInput = false;
             }
             else if (!RX3.IsMatch(priceBox.Text))
             {
                 MessageBox.Show("Please enter a valid amount similar to the following format: [75.00]");
+                priceBox.Focus();
                 perfectInput = false;
             }
 
@@ -117,8 +120,8 @@ namespace COMPE561_Lab05
                     {
                         //create a command object using the "portal" object, and a SQL query that inserts a row of data into the database's "book" table
                         string query =
-                            "INSERT INTO book (title, author, isbn, price) " +
-                            $"VALUES ('{titleBox.Text}', '{authorBox.Text}', '{isbnBox.Text}', {priceBox.Text});";
+                            "INSERT INTO book(title, author, isbn, price) " +
+                            $"VALUES('{titleBox.Text}', '{authorBox.Text}', '{isbnBox.Text}', {priceBox.Text});";
                         MySqlCommand insertion_command = new MySqlCommand(query, dbPortal);
                         insertion_command.CommandTimeout = timelim; //ensure the command doesn't take too long
 
@@ -163,7 +166,7 @@ namespace COMPE561_Lab05
             isbnBox.Enabled = true;
             priceBox.Enabled = true;
 
-            titleBox.Focus(); //set focus to first name textbox
+            titleBox.Focus(); //set focus to title textbox
         }
 
 
@@ -209,7 +212,7 @@ namespace COMPE561_Lab05
         }
 
 
-        //instantiates book objects and wires them to the combo box
+        //reads from the database, instantiates book objects, and wires them to the combo box
         private void populateDropdown()
         {
             //create a list to contain book objects read from the database

@@ -56,41 +56,49 @@ namespace COMPE561_Lab05
             if (!RX1.IsMatch(fnBox.Text))
             {
                 MessageBox.Show("Please enter a valid first name. Only alphabetical characters permitted.");
+                fnBox.Focus();
                 perfectInput = false;
             }
             else if (!RX1.IsMatch(lnBox.Text))
             {
                 MessageBox.Show("Please enter a valid last name. Only alphabetical characters permitted.");
+                lnBox.Focus();
                 perfectInput = false;
             }
             else if (!RX2.IsMatch(addressBox.Text))
             {
                 MessageBox.Show("Please enter a valid address similar the following format: [12345 Fake Street Pkwy]");
+                addressBox.Focus();
                 perfectInput = false;
             }
             else if (!RX1.IsMatch(cityBox.Text))
             {
                 MessageBox.Show("Please enter a valid city. Only alphabetical characters permitted.");
+                cityBox.Focus();
                 perfectInput = false;
             }
             else if (!RX3.IsMatch(stateBox.Text))
             {
                 MessageBox.Show("Please enter a valid 2-character state code in capital letters.");
+                stateBox.Focus();
                 perfectInput = false;
             }
             else if (!RX4.IsMatch(zipBox.Text))
             {
                 MessageBox.Show("Please enter a valid zip code. Must be 5-6 numerical digits long.");
+                zipBox.Focus();
                 perfectInput = false;
             }
             else if (!RX5.IsMatch(phoneBox.Text))
             {
                 MessageBox.Show("Please enter a valid phone number. Must include area code and dashes.");
+                phoneBox.Focus();
                 perfectInput = false;
             }
             else if (!RX6.IsMatch(emailBox.Text))
             {
                 MessageBox.Show("Please enter a valid email address similar the following format: [example123@local.com]");
+                emailBox.Focus();
                 perfectInput = false;
             }
 
@@ -145,8 +153,8 @@ namespace COMPE561_Lab05
                     {
                         //create a command object using the "portal" object, and a SQL query that inserts a row of data into the database's "customer" table
                         string query =
-                            "INSERT INTO customer (first, last, address, city, state, zip, phone, email, id) " +
-                            $"VALUES ('{fnBox.Text}', '{lnBox.Text}', '{addressBox.Text}', '{cityBox.Text}', " +
+                            "INSERT INTO customer(first, last, address, city, state, zip, phone, email, id) " +
+                            $"VALUES('{fnBox.Text}', '{lnBox.Text}', '{addressBox.Text}', '{cityBox.Text}', " +
                             $"'{stateBox.Text}', '{zipBox.Text}', '{phoneBox.Text}', '{emailBox.Text}', '{gen_id()}');";
                         MySqlCommand insertion_command = new MySqlCommand(query, dbPortal);
                         insertion_command.CommandTimeout = timelim; //ensure the command doesn't take too long
@@ -257,7 +265,7 @@ namespace COMPE561_Lab05
         }
 
 
-        //instantiates customer objects and wires them to the combo box
+        //reads from the database, instantiates customer objects, and wires them to the combo box
         private void populateDropdown()
         {
             //create a list to contain customer objects read from the database
