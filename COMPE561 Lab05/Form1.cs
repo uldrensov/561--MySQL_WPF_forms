@@ -39,7 +39,7 @@ namespace COMPE561_Lab05
         {
             bookForm g = new bookForm();
             g.Show();
-            Hide();
+            //Hide();
         }
 
 
@@ -48,7 +48,7 @@ namespace COMPE561_Lab05
         {
             orderForm h = new orderForm();
             h.Show();
-            Hide();
+            //Hide();
         }
     }
 }

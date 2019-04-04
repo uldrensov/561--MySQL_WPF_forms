@@ -18,7 +18,7 @@ namespace COMPE561_Lab05
         public string zip { get; set; }
         public string phone { get; set; }
         public string email { get; set; }
-        public string key { get; set; }
+        public string id { get; set; }
 
 
         //default constructor
@@ -32,12 +32,12 @@ namespace COMPE561_Lab05
             zip = "00000";
             phone = "000-000-0000";
             email = "sample@default.com";
-            key = "ABCDEF";
+            id = "ABCDEF";
         }
 
 
         //explicit val constructor
-        public customer(string First, string Last, string Address, string City, string State, string Zip, string Phone, string Email, string Key)
+        public customer(string First, string Last, string Address, string City, string State, string Zip, string Phone, string Email, string Id)
         {
             first = First;
             last = Last;
@@ -47,7 +47,7 @@ namespace COMPE561_Lab05
             zip = Zip;
             phone = Phone;
             email = Email;
-            key = Key;
+            id = Id;
         }
 
 

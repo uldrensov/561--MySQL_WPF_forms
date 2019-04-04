@@ -15,14 +15,10 @@ namespace COMPE561_Lab05
 {
     public partial class customerForm : Form
     {
-        const string file_name = "customers.txt"; //source/destination file name
-        const char DELIM = ','; //delimiter character
+        const string connection_keycard = "datasource=127.0.0.1;port=3306;username=root;password=;database=lab5"; //"key" to the database
+        const int timelim = 30; //command timeout time limit (seconds)
+        const int idlength = 6; //customer id length
 
-        //"key" to the database
-        const string connection_keycard = "datasource=127.0.0.1;port=3306;username=root;password=;database=lab5";
-
-        //customer key length
-        const int keylength = 6;
 
         //form init
         public customerForm()
@@ -101,106 +97,77 @@ namespace COMPE561_Lab05
             //only proceed if all input fields are valid
             if (perfectInput)
             {
+                //create a connection "portal" to the database using the "keycard" string
+                MySqlConnection dbPortal = new MySqlConnection(connection_keycard);
 
                 //if editing an existing customer (it should be selected in the combo box)
                 if (!(custDropdown.SelectedItem is null))
                 {
-                    //clone the old list of customers
-                    List<customer> clonedList = new List<customer>();
-
-                    //read lines from the .txt and generate customer objects to populate the cloned list
-                    try
+                    //set up a yes-no dialogue prompt, and proceed only if "Yes" is chosen
+                    DialogResult choice = MessageBox.Show("Are you sure you want to edit the selected entry?", "Confirm edit", MessageBoxButtons.YesNo);
+                    if (choice == DialogResult.Yes)
                     {
-                        StreamReader read_tool = new StreamReader(file_name);
-                        string cust_line; //holds the line being read from the .txt
-                        while ((cust_line = read_tool.ReadLine()) != null) //while the current line is not empty (implying there are more)
+                        //create a command object using the "portal" object, and a SQL query that updates a row of data from the database's "customer" table
+                        string query =
+                            "UPDATE customer " +
+                            $"SET first = '{fnBox.Text}', last = '{lnBox.Text}', address = '{addressBox.Text}', city = '{cityBox.Text}', " +
+                            $"state = '{stateBox.Text}', zip = '{zipBox.Text}', phone = '{phoneBox.Text}', email = '{emailBox.Text}' " +
+                            $"WHERE id = '{idBox.Text}';";
+                        MySqlCommand update_command = new MySqlCommand(query, dbPortal);
+                        update_command.CommandTimeout = timelim; //ensure the command doesn't take too long
+
+                        //open the "portal" and update data
+                        try
                         {
-                            string[] cust_properties = cust_line.Split(DELIM); //split the line into multiple strings, then store them in an array
-                            clonedList.Add(new customer(cust_properties[0], cust_properties[1], cust_properties[2],
-                                cust_properties[3], cust_properties[4], cust_properties[5], cust_properties[6],
-                                cust_properties[7], cust_properties[8])); //use the strings to construct a customer object, and add it to the list
+                            dbPortal.Open();
+                            update_command.ExecuteNonQuery();
+
+                            //confirm success, refresh the combo box, clean up the form
+                            MessageBox.Show("Customer data successfully edited.");
+                            populateDropdown();
+                            resetOrEdit();
                         }
-                        read_tool.Close();
-                    }
 
-                    catch
-                    {
-                        MessageBox.Show("BUGSPLAT: Failed to edit customer data: error code [001]. Application will now exit...");
-                        Environment.Exit(0);
-                    }
-
-                    //obtain the currently selected customer object
-                    customer selected_cust = custDropdown.SelectedItem as customer;
-
-                    //iterate through the list to find the customer's index
-                    int index = 0;
-                    for (int i = 0; i < clonedList.Count; i++)
-                    {
-                        //locate the customer via key
-                        if (clonedList[i].key == selected_cust.key)
+                        catch (Exception err)
                         {
-                            index = i;
-                            break;
+                            MessageBox.Show($"ERROR: {err.Message}");
+                            MessageBox.Show("Failed to record customer information. Please contact the admin.");
                         }
                     }
-
-                    //read the whole .txt and populate a string array with its contents
-                    string[] listContents = new string[clonedList.Count];
-                    try
-                    {
-                        listContents = File.ReadAllLines(file_name);
-                    }
-
-                    catch
-                    {
-                        MessageBox.Show("BUGSPLAT: Failed to edit customer data: error code [002]. Application will now exit...");
-                        Environment.Exit(0);
-                    }
-
-                    //use the customer's index to make necessary edits from the array
-                    listContents[index] = $"{fnBox.Text},{lnBox.Text},{addressBox.Text},{cityBox.Text},{stateBox.Text},{zipBox.Text},{phoneBox.Text},{emailBox.Text},{selected_cust.key}";
-
-                    //update and overwrite the .txt with the array
-                    File.WriteAllLines(file_name, listContents);
-
-                    //confirm success, refresh the combo box, clean up the form
-                    MessageBox.Show("Customer information successfully edited.");
-                    populateDropdown();
-                    resetOrEdit();
                 }
 
                 //if adding a new customer (no combo box selection)
                 else
                 {
-                    try
+                    //set up a yes-no dialogue prompt, and proceed only if "Yes" is chosen
+                    DialogResult choice = MessageBox.Show("Are you sure you want to create a new entry?", "Confirm new entry", MessageBoxButtons.YesNo);
+                    if (choice == DialogResult.Yes)
                     {
-                        string mainkey = gen_key(); //create a new key for the new customer
-                        FileStream destination = new FileStream(file_name, FileMode.Append, FileAccess.Write);
-                        StreamWriter write_tool = new StreamWriter(destination);
+                        //create a command object using the "portal" object, and a SQL query that inserts a row of data into the database's "customer" table
+                        string query =
+                            "INSERT INTO customer (first, last, address, city, state, zip, phone, email, id) " +
+                            $"VALUES ('{fnBox.Text}', '{lnBox.Text}', '{addressBox.Text}', '{cityBox.Text}', " +
+                            $"'{stateBox.Text}', '{zipBox.Text}', '{phoneBox.Text}', '{emailBox.Text}', '{gen_id()}');";
+                        MySqlCommand insertion_command = new MySqlCommand(query, dbPortal);
+                        insertion_command.CommandTimeout = timelim; //ensure the command doesn't take too long
 
-                        write_tool.Write($"{fnBox.Text}{DELIM}");
-                        write_tool.Write($"{lnBox.Text}{DELIM}");
-                        write_tool.Write($"{addressBox.Text}{DELIM}");
-                        write_tool.Write($"{cityBox.Text}{DELIM}");
-                        write_tool.Write($"{stateBox.Text}{DELIM}");
-                        write_tool.Write($"{zipBox.Text}{DELIM}");
-                        write_tool.Write($"{phoneBox.Text}{DELIM}");
-                        write_tool.Write($"{emailBox.Text}{DELIM}");
-                        write_tool.Write($"{mainkey}\n");
+                        //open the "portal" and insert data
+                        try
+                        {
+                            dbPortal.Open();
+                            insertion_command.ExecuteNonQuery();
 
-                        write_tool.Close();
-                        destination.Close();
+                            //confirm success, refresh the combo box, clean up the form
+                            MessageBox.Show("New customer data successfully saved.");
+                            populateDropdown();
+                            resetOrEdit();
+                        }
 
-                        //confirm success, refresh the combo box, clean up the form
-                        MessageBox.Show("New customer information successfully saved.");
-                        populateDropdown();
-                        resetOrEdit();
-                    }
-
-                    catch (Exception err)
-                    {
-                        MessageBox.Show($"ERROR: {err.Message}");
-                        MessageBox.Show("Failed to record customer information. Please contact the admin.");
+                        catch (Exception err)
+                        {
+                            MessageBox.Show($"ERROR: {err.Message}");
+                            MessageBox.Show("Failed to record customer information. Please contact the admin.");
+                        }
                     }
                 }
             }
@@ -222,8 +189,9 @@ namespace COMPE561_Lab05
             zipBox.Text = null;
             phoneBox.Text = null;
             emailBox.Text = null;
+            idBox.Text = null;
 
-            //enable textboxes
+            //enable textboxes (important: id is auto-generated; leave textbox disabled)
             fnBox.Enabled = true;
             lnBox.Enabled = true;
             addressBox.Enabled = true;
@@ -240,21 +208,23 @@ namespace COMPE561_Lab05
         //cancel button: resets the form to default/edit mode
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            resetOrEdit();
+            //set up a yes-no dialogue prompt, and reset the form if "Yes" is chosen
+            DialogResult choice = MessageBox.Show("Cancel current action and reset the form?", "Cancel action", MessageBoxButtons.YesNo);
+            if (choice == DialogResult.Yes) resetOrEdit();
         }
 
 
-        //back button: stow the current form and return to the main menu
+        //back button: stows the current form and returns to the main menu
         private void backButton_Click(object sender, EventArgs e)
         {
-
+            Close();
         }
 
 
         //combo box select: enables all textboxes, displays information in textboxes based on selection
         private void custDropdown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //"awaken" the form
+            //"awaken" the form (important: leave id textbox disabled)
             fnBox.Enabled = true;
             lnBox.Enabled = true;
             addressBox.Enabled = true;
@@ -279,13 +249,11 @@ namespace COMPE561_Lab05
                 zipBox.Text = selected_cust.zip;
                 phoneBox.Text = selected_cust.phone;
                 emailBox.Text = selected_cust.email;
+                idBox.Text = selected_cust.id;
             }
 
             //if there is no selection, ensure the form does not "awaken"
-            else
-            {
-                resetOrEdit();
-            }
+            else resetOrEdit();
         }
 
 
@@ -301,7 +269,7 @@ namespace COMPE561_Lab05
             //create a command object using the "portal" object, and a SQL query that reads all information from the database's "customer" table
             string query = "SELECT * FROM customer";
             MySqlCommand read_command = new MySqlCommand(query, dbPortal);
-            read_command.CommandTimeout = 30; //ensure the command doesn't take too long
+            read_command.CommandTimeout = timelim; //ensure the command doesn't take too long
 
             //open the "portal" and begin reading data
             try
@@ -348,6 +316,7 @@ namespace COMPE561_Lab05
             zipBox.Text = null;
             phoneBox.Text = null;
             emailBox.Text = null;
+            idBox.Text = null;
 
             //disable textboxes
             fnBox.Enabled = false;
@@ -358,29 +327,26 @@ namespace COMPE561_Lab05
             zipBox.Enabled = false;
             phoneBox.Enabled = false;
             emailBox.Enabled = false;
+            idBox.Enabled = false;
         }
 
 
-        //generates a random customer key
-        private string gen_key()
+        //generates a random customer id
+        private string gen_id()
         {
             Random RNGesus = new Random();
 
-            //create and populate a char array with random characters
-            char[] keychars = new char[keylength];
-            for (int z = 0; z < keylength; z++)
+            //create and populate a char array with random numbers
+            char[] idchars = new char[idlength];
+            for (int z = 0; z < idlength; z++)
             {
-                int rand = RNGesus.Next(45, 126);
-                keychars[z] = (char)rand;
+                int rand = RNGesus.Next(48, 58);
+                idchars[z] = (char)rand;
             }
 
             //convert to string and return
-            string randkey = new string(keychars);
-            return randkey;
+            string randID = new string(idchars);
+            return randID;
         }
     }
 }
-
-//TODO: replace all the notepad interactions with database interactions
-//ask user for confirmation on save and mention whether its edit or new
-//ask for cancel confirmation

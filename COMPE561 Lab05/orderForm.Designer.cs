@@ -51,6 +51,8 @@
             this.custselLabel = new System.Windows.Forms.Label();
             this.custselDropdown = new System.Windows.Forms.ComboBox();
             this.backButton = new System.Windows.Forms.Button();
+            this.idbox = new System.Windows.Forms.TextBox();
+            this.idlabel = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.maingrid)).BeginInit();
             this.SuspendLayout();
             // 
@@ -62,6 +64,7 @@
             this.confirmbutton.TabIndex = 39;
             this.confirmbutton.Text = "Confirm order";
             this.confirmbutton.UseVisualStyleBackColor = true;
+            this.confirmbutton.Click += new System.EventHandler(this.confirmbutton_Click);
             // 
             // cancelbutton
             // 
@@ -71,6 +74,7 @@
             this.cancelbutton.TabIndex = 38;
             this.cancelbutton.Text = "Cancel order";
             this.cancelbutton.UseVisualStyleBackColor = true;
+            this.cancelbutton.Click += new System.EventHandler(this.cancelbutton_Click);
             // 
             // taxlabel
             // 
@@ -209,6 +213,7 @@
             this.bookselDropdown.Name = "bookselDropdown";
             this.bookselDropdown.Size = new System.Drawing.Size(544, 21);
             this.bookselDropdown.TabIndex = 21;
+            this.bookselDropdown.SelectedIndexChanged += new System.EventHandler(this.bookselDropdown_SelectedIndexChanged);
             // 
             // addbutton
             // 
@@ -218,6 +223,7 @@
             this.addbutton.TabIndex = 20;
             this.addbutton.Text = "Add titles";
             this.addbutton.UseVisualStyleBackColor = true;
+            this.addbutton.Click += new System.EventHandler(this.addbutton_Click);
             // 
             // custselLabel
             // 
@@ -233,8 +239,9 @@
             this.custselDropdown.FormattingEnabled = true;
             this.custselDropdown.Location = new System.Drawing.Point(116, 30);
             this.custselDropdown.Name = "custselDropdown";
-            this.custselDropdown.Size = new System.Drawing.Size(544, 21);
+            this.custselDropdown.Size = new System.Drawing.Size(290, 21);
             this.custselDropdown.TabIndex = 40;
+            this.custselDropdown.SelectedIndexChanged += new System.EventHandler(this.custselDropdown_SelectedIndexChanged);
             // 
             // backButton
             // 
@@ -244,12 +251,31 @@
             this.backButton.TabIndex = 42;
             this.backButton.Text = "Back to menu";
             this.backButton.UseVisualStyleBackColor = true;
+            this.backButton.Click += new System.EventHandler(this.backButton_Click);
+            // 
+            // idbox
+            // 
+            this.idbox.Location = new System.Drawing.Point(493, 31);
+            this.idbox.Name = "idbox";
+            this.idbox.Size = new System.Drawing.Size(100, 20);
+            this.idbox.TabIndex = 43;
+            // 
+            // idlabel
+            // 
+            this.idlabel.AutoSize = true;
+            this.idlabel.Location = new System.Drawing.Point(466, 34);
+            this.idlabel.Name = "idlabel";
+            this.idlabel.Size = new System.Drawing.Size(21, 13);
+            this.idlabel.TabIndex = 44;
+            this.idlabel.Text = "ID:";
             // 
             // orderForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(750, 549);
+            this.Controls.Add(this.idlabel);
+            this.Controls.Add(this.idbox);
             this.Controls.Add(this.backButton);
             this.Controls.Add(this.custselLabel);
             this.Controls.Add(this.custselDropdown);
@@ -307,5 +333,7 @@
         private System.Windows.Forms.Label custselLabel;
         private System.Windows.Forms.ComboBox custselDropdown;
         private System.Windows.Forms.Button backButton;
+        private System.Windows.Forms.TextBox idbox;
+        private System.Windows.Forms.Label idlabel;
     }
 }

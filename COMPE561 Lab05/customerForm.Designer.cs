@@ -50,12 +50,14 @@
             this.fnBox = new System.Windows.Forms.TextBox();
             this.custDropdown = new System.Windows.Forms.ComboBox();
             this.backButton = new System.Windows.Forms.Button();
+            this.idLabel = new System.Windows.Forms.Label();
+            this.idBox = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // comboLabel
             // 
             this.comboLabel.AutoSize = true;
-            this.comboLabel.Location = new System.Drawing.Point(36, 58);
+            this.comboLabel.Location = new System.Drawing.Point(36, 47);
             this.comboLabel.Name = "comboLabel";
             this.comboLabel.Size = new System.Drawing.Size(112, 13);
             this.comboLabel.TabIndex = 41;
@@ -69,6 +71,7 @@
             this.cancelButton.TabIndex = 40;
             this.cancelButton.Text = "Cancel";
             this.cancelButton.UseVisualStyleBackColor = true;
+            this.cancelButton.Click += new System.EventHandler(this.cancelButton_Click);
             // 
             // saveButton
             // 
@@ -78,6 +81,7 @@
             this.saveButton.TabIndex = 39;
             this.saveButton.Text = "Save";
             this.saveButton.UseVisualStyleBackColor = true;
+            this.saveButton.Click += new System.EventHandler(this.saveButton_Click);
             // 
             // newcustButton
             // 
@@ -87,11 +91,12 @@
             this.newcustButton.TabIndex = 38;
             this.newcustButton.Text = "New customer";
             this.newcustButton.UseVisualStyleBackColor = true;
+            this.newcustButton.Click += new System.EventHandler(this.newcustButton_Click);
             // 
             // emailLabel
             // 
             this.emailLabel.AutoSize = true;
-            this.emailLabel.Location = new System.Drawing.Point(90, 357);
+            this.emailLabel.Location = new System.Drawing.Point(90, 326);
             this.emailLabel.Name = "emailLabel";
             this.emailLabel.Size = new System.Drawing.Size(35, 13);
             this.emailLabel.TabIndex = 37;
@@ -100,7 +105,7 @@
             // zipLabel
             // 
             this.zipLabel.AutoSize = true;
-            this.zipLabel.Location = new System.Drawing.Point(540, 240);
+            this.zipLabel.Location = new System.Drawing.Point(540, 229);
             this.zipLabel.Name = "zipLabel";
             this.zipLabel.Size = new System.Drawing.Size(25, 13);
             this.zipLabel.TabIndex = 36;
@@ -109,7 +114,7 @@
             // phoneLabel
             // 
             this.phoneLabel.AutoSize = true;
-            this.phoneLabel.Location = new System.Drawing.Point(90, 322);
+            this.phoneLabel.Location = new System.Drawing.Point(90, 291);
             this.phoneLabel.Name = "phoneLabel";
             this.phoneLabel.Size = new System.Drawing.Size(41, 13);
             this.phoneLabel.TabIndex = 35;
@@ -118,7 +123,7 @@
             // addressLabel
             // 
             this.addressLabel.AutoSize = true;
-            this.addressLabel.Location = new System.Drawing.Point(90, 163);
+            this.addressLabel.Location = new System.Drawing.Point(90, 152);
             this.addressLabel.Name = "addressLabel";
             this.addressLabel.Size = new System.Drawing.Size(48, 13);
             this.addressLabel.TabIndex = 34;
@@ -127,7 +132,7 @@
             // cityLabel
             // 
             this.cityLabel.AutoSize = true;
-            this.cityLabel.Location = new System.Drawing.Point(90, 240);
+            this.cityLabel.Location = new System.Drawing.Point(90, 229);
             this.cityLabel.Name = "cityLabel";
             this.cityLabel.Size = new System.Drawing.Size(27, 13);
             this.cityLabel.TabIndex = 33;
@@ -136,7 +141,7 @@
             // stateLabel
             // 
             this.stateLabel.AutoSize = true;
-            this.stateLabel.Location = new System.Drawing.Point(375, 240);
+            this.stateLabel.Location = new System.Drawing.Point(375, 229);
             this.stateLabel.Name = "stateLabel";
             this.stateLabel.Size = new System.Drawing.Size(35, 13);
             this.stateLabel.TabIndex = 32;
@@ -145,7 +150,7 @@
             // lnLabel
             // 
             this.lnLabel.AutoSize = true;
-            this.lnLabel.Location = new System.Drawing.Point(417, 127);
+            this.lnLabel.Location = new System.Drawing.Point(417, 116);
             this.lnLabel.Name = "lnLabel";
             this.lnLabel.Size = new System.Drawing.Size(59, 13);
             this.lnLabel.TabIndex = 31;
@@ -154,7 +159,7 @@
             // fnLabel
             // 
             this.fnLabel.AutoSize = true;
-            this.fnLabel.Location = new System.Drawing.Point(90, 127);
+            this.fnLabel.Location = new System.Drawing.Point(90, 116);
             this.fnLabel.Name = "fnLabel";
             this.fnLabel.Size = new System.Drawing.Size(58, 13);
             this.fnLabel.TabIndex = 30;
@@ -162,56 +167,56 @@
             // 
             // emailBox
             // 
-            this.emailBox.Location = new System.Drawing.Point(154, 354);
+            this.emailBox.Location = new System.Drawing.Point(154, 323);
             this.emailBox.Name = "emailBox";
             this.emailBox.Size = new System.Drawing.Size(286, 20);
             this.emailBox.TabIndex = 29;
             // 
             // phoneBox
             // 
-            this.phoneBox.Location = new System.Drawing.Point(154, 319);
+            this.phoneBox.Location = new System.Drawing.Point(154, 288);
             this.phoneBox.Name = "phoneBox";
             this.phoneBox.Size = new System.Drawing.Size(286, 20);
             this.phoneBox.TabIndex = 28;
             // 
             // zipBox
             // 
-            this.zipBox.Location = new System.Drawing.Point(571, 237);
+            this.zipBox.Location = new System.Drawing.Point(571, 226);
             this.zipBox.Name = "zipBox";
             this.zipBox.Size = new System.Drawing.Size(71, 20);
             this.zipBox.TabIndex = 27;
             // 
             // stateBox
             // 
-            this.stateBox.Location = new System.Drawing.Point(416, 237);
+            this.stateBox.Location = new System.Drawing.Point(416, 226);
             this.stateBox.Name = "stateBox";
             this.stateBox.Size = new System.Drawing.Size(71, 20);
             this.stateBox.TabIndex = 26;
             // 
             // cityBox
             // 
-            this.cityBox.Location = new System.Drawing.Point(154, 237);
+            this.cityBox.Location = new System.Drawing.Point(154, 226);
             this.cityBox.Name = "cityBox";
             this.cityBox.Size = new System.Drawing.Size(161, 20);
             this.cityBox.TabIndex = 25;
             // 
             // lnBox
             // 
-            this.lnBox.Location = new System.Drawing.Point(481, 124);
+            this.lnBox.Location = new System.Drawing.Point(481, 113);
             this.lnBox.Name = "lnBox";
             this.lnBox.Size = new System.Drawing.Size(161, 20);
             this.lnBox.TabIndex = 24;
             // 
             // addressBox
             // 
-            this.addressBox.Location = new System.Drawing.Point(154, 160);
+            this.addressBox.Location = new System.Drawing.Point(154, 149);
             this.addressBox.Name = "addressBox";
             this.addressBox.Size = new System.Drawing.Size(488, 20);
             this.addressBox.TabIndex = 23;
             // 
             // fnBox
             // 
-            this.fnBox.Location = new System.Drawing.Point(154, 124);
+            this.fnBox.Location = new System.Drawing.Point(154, 113);
             this.fnBox.Name = "fnBox";
             this.fnBox.Size = new System.Drawing.Size(161, 20);
             this.fnBox.TabIndex = 22;
@@ -219,7 +224,7 @@
             // custDropdown
             // 
             this.custDropdown.FormattingEnabled = true;
-            this.custDropdown.Location = new System.Drawing.Point(154, 55);
+            this.custDropdown.Location = new System.Drawing.Point(154, 44);
             this.custDropdown.Name = "custDropdown";
             this.custDropdown.Size = new System.Drawing.Size(320, 21);
             this.custDropdown.TabIndex = 21;
@@ -235,11 +240,29 @@
             this.backButton.UseVisualStyleBackColor = true;
             this.backButton.Click += new System.EventHandler(this.backButton_Click);
             // 
+            // idLabel
+            // 
+            this.idLabel.AutoSize = true;
+            this.idLabel.Location = new System.Drawing.Point(90, 385);
+            this.idLabel.Name = "idLabel";
+            this.idLabel.Size = new System.Drawing.Size(52, 13);
+            this.idLabel.TabIndex = 43;
+            this.idLabel.Text = "ID (Auto):";
+            // 
+            // idBox
+            // 
+            this.idBox.Location = new System.Drawing.Point(154, 382);
+            this.idBox.Name = "idBox";
+            this.idBox.Size = new System.Drawing.Size(71, 20);
+            this.idBox.TabIndex = 44;
+            // 
             // customerForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(870, 427);
+            this.ClientSize = new System.Drawing.Size(870, 437);
+            this.Controls.Add(this.idBox);
+            this.Controls.Add(this.idLabel);
             this.Controls.Add(this.backButton);
             this.Controls.Add(this.comboLabel);
             this.Controls.Add(this.cancelButton);
@@ -294,5 +317,7 @@
         private System.Windows.Forms.TextBox fnBox;
         private System.Windows.Forms.ComboBox custDropdown;
         private System.Windows.Forms.Button backButton;
+        private System.Windows.Forms.Label idLabel;
+        private System.Windows.Forms.TextBox idBox;
     }
 }

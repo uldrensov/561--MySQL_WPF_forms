@@ -10,12 +10,16 @@ using System.Windows.Forms;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 
+/// <summary>
+/// TODO: data table specifications go here
+/// </summary>
 namespace COMPE561_Lab05
 {
     public partial class bookForm : Form
     {
-        //"key" to the database
-        const string connection_keycard = "datasource=127.0.0.1;port=3306;username=root;password=;database=lab5";
+        const string connection_keycard = "datasource=127.0.0.1;port=3306;username=root;password=;database=lab5"; //"key" to the database
+        const int timelim = 30; //command timeout time limit (seconds)
+
 
         //form init
         public bookForm()
@@ -40,9 +44,9 @@ namespace COMPE561_Lab05
         private void saveButton_Click(object sender, EventArgs e)
         {
             //use regular expressions to detect proper/improper user inputs
-            Regex RX1 = new Regex("^[a-zA-Z]{1,30}$"); //regex for author
+            Regex RX1 = new Regex("^[a-zA-Z ]{1,30}$"); //regex for author
             Regex RX2 = new Regex("^[0-9]{5}$"); //regex for isbn
-            Regex RX3 = new Regex("^[0-9]{1,4}.[0-9]{2}$"); //regex for price
+            Regex RX3 = new Regex("^[0-9]{1,3}.[0-9]{2}$"); //regex for price
 
             bool perfectInput = true; //this flag becomes false if any input field is found invalid
 
@@ -72,42 +76,70 @@ namespace COMPE561_Lab05
                 //if editing an existing book (it should be selected in the combo box)
                 if (!(bookDropdown.SelectedItem is null))
                 {
-                    //
-                    string query = 
-                        "UPDATE book " +
-                        $"SET title = '{titleBox.Text}', author = '{authorBox.Text}', isbn = {isbnBox.Text}, price = {priceBox.Text} " +
-                        "WHERE 1;";
+                    //set up a yes-no dialogue prompt, and proceed only if "Yes" is chosen
+                    DialogResult choice = MessageBox.Show("Are you sure you want to edit the selected entry?", "Confirm edit", MessageBoxButtons.YesNo);
+                    if (choice == DialogResult.Yes)
+                    {
+                        //create a command object using the "portal" object, and a SQL query that updates a row of data from the database's "book" table
+                        string query =
+                            "UPDATE book " +
+                            $"SET title = '{titleBox.Text}', author = '{authorBox.Text}', price = {priceBox.Text} " +
+                            $"WHERE isbn = '{isbnBox.Text}';";
+                        MySqlCommand update_command = new MySqlCommand(query, dbPortal);
+                        update_command.CommandTimeout = timelim; //ensure the command doesn't take too long
 
-                    //TODO
+                        //open the "portal" and update data
+                        try
+                        {
+                            dbPortal.Open();
+                            update_command.ExecuteNonQuery();
+
+                            //confirm success, refresh the combo box, clean up the form
+                            MessageBox.Show("Book data successfully edited.");
+                            populateDropdown();
+                            resetOrEdit();
+                        }
+
+                        catch (Exception err)
+                        {
+                            MessageBox.Show($"ERROR: {err.Message}");
+                            MessageBox.Show("Failed to record book information. Please contact the admin.");
+                        }
+                    }
                 }
 
                 //if adding a new book (no combo box selection)
                 else
                 {
-                    //create a command object using the "portal" object, and a SQL query that inserts a row of data into the database's "book" table
-                    string query = 
-                        "INSERT INTO book (title, author, isbn, price) " +
-                        $"VALUES ('{titleBox.Text}', '{authorBox.Text}', {isbnBox.Text}, {priceBox.Text});";
-                    MySqlCommand insertion_command = new MySqlCommand(query, dbPortal);
-                    insertion_command.CommandTimeout = 30; //ensure the command doesn't take too long
-
-                    //open the "portal" and insert data
-                    try
+                    //set up a yes-no dialogue prompt, and proceed only if "Yes" is chosen
+                    DialogResult choice = MessageBox.Show("Are you sure you want to create a new entry?", "Confirm new entry", MessageBoxButtons.YesNo);
+                    if (choice == DialogResult.Yes)
                     {
-                        dbPortal.Open();
-                        insertion_command.ExecuteNonQuery();
+                        //create a command object using the "portal" object, and a SQL query that inserts a row of data into the database's "book" table
+                        string query =
+                            "INSERT INTO book (title, author, isbn, price) " +
+                            $"VALUES ('{titleBox.Text}', '{authorBox.Text}', '{isbnBox.Text}', {priceBox.Text});";
+                        MySqlCommand insertion_command = new MySqlCommand(query, dbPortal);
+                        insertion_command.CommandTimeout = timelim; //ensure the command doesn't take too long
 
-                        //confirm success, refresh the combo box, clean up the form
-                        MessageBox.Show("New book data successfully saved.");
-                        populateDropdown();
-                        resetOrEdit();
-                    }
+                        //open the "portal" and insert data
+                        try
+                        {
+                            dbPortal.Open();
+                            insertion_command.ExecuteNonQuery();
 
-                    catch (Exception err)
-                    {
-                        MessageBox.Show($"ERROR: {err.Message}");
-                        MessageBox.Show("Failed to record book information. Please contact the admin.");
-                    }
+                            //confirm success, refresh the combo box, clean up the form
+                            MessageBox.Show("New book data successfully saved.");
+                            populateDropdown();
+                            resetOrEdit();
+                        }
+
+                        catch (Exception err)
+                        {
+                            MessageBox.Show($"ERROR: {err.Message}");
+                            MessageBox.Show("Failed to record book information. Please contact the admin.");
+                        }
+                    }           
                 }
             }
         }
@@ -138,24 +170,25 @@ namespace COMPE561_Lab05
         //cancel button: resets the form to default/edit mode
         private void cancelButton_Click(object sender, EventArgs e)
         {
-            resetOrEdit();
+            //set up a yes-no dialogue prompt, and reset the form if "Yes" is chosen
+            DialogResult choice = MessageBox.Show("Cancel current action and reset the form?", "Cancel action", MessageBoxButtons.YesNo);
+            if (choice == DialogResult.Yes) resetOrEdit();
         }
 
 
-        //back button: stow the current form and return to the main menu
+        //back button: stows the current form and returns to the main menu
         private void backButton_Click(object sender, EventArgs e)
         {
-            
+            Close();
         }
 
 
         //combo box select: enables all textboxes, displays information in textboxes based on selection
         private void bookDropdown_SelectedIndexChanged(object sender, EventArgs e)
         {
-            //"awaken" the form
+            //"awaken" the form (important: leave isbn textbox disabled)
             titleBox.Enabled = true;
             authorBox.Enabled = true;
-            isbnBox.Enabled = true;
             priceBox.Enabled = true;
 
             //if an item is chosen, populate the textboxes
@@ -172,10 +205,7 @@ namespace COMPE561_Lab05
             }
 
             //if there is no selection, ensure the form does not "awaken"
-            else
-            {
-                resetOrEdit();
-            }
+            else resetOrEdit();
         }
 
 
@@ -191,7 +221,7 @@ namespace COMPE561_Lab05
             //create a command object using the "portal" object, and a SQL query that reads all information from the database's "book" table
             string query = "SELECT * FROM book";
             MySqlCommand read_command = new MySqlCommand(query, dbPortal);
-            read_command.CommandTimeout = 30; //ensure the command doesn't take too long
+            read_command.CommandTimeout = timelim; //ensure the command doesn't take too long
 
             //open the "portal" and begin reading data
             try
@@ -242,7 +272,3 @@ namespace COMPE561_Lab05
         }
     }
 }
-
-//TODO: finish implementing edit features on the save button
-//ask user for confirmation on save and mention whether its edit or new
-//ask for cancel confirmation
