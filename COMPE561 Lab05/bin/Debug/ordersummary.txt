@@ -1,16 +1,14 @@
 *****ORDER SUMMARY*****
 
-CUSTOMER: William Phan
-ID: 744430
-ORDER NUMBER: 7793495987
+CUSTOMER: Beb Breloom
+ID: 995414
+ORDER NUMBER: 2558302624
 DATE: 4/4/2019
 
------Vietnamese Heritage ($6.00)  *2   =   $12.00
------Oceanography ($9.99)  *1   =   $9.99
------Boontean Boology ($0.10)  *1   =   $0.10
+-----GLOW IN THE DARK CIA ($999.99)  *99   =   $98999.01
 
-SUBTOTAL: $22.09
-TAX: $2.21
-TOTAL: $24.30
+SUBTOTAL: $98999.01
+TAX: $9899.91
+TOTAL: $108898.92
 
 *******THANK YOU*******

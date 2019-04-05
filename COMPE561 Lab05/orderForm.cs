@@ -55,6 +55,9 @@ namespace COMPE561_Lab05
             authorbox.Enabled = false;
             isbnbox.Enabled = false;
             pricebox.Enabled = false;
+            subtotalbox.Enabled = false;
+            taxbox.Enabled = false;
+            totalbox.Enabled = false;
 
             //set up the columns of the datatable
             dt.Columns.AddRange(new DataColumn[4]
@@ -92,19 +95,25 @@ namespace COMPE561_Lab05
                 //proceed if the quantity input is valid
                 if (int.TryParse(qtybox.Text, out int quantity))
                 {
-                    //proceed if the quantity entered is nonzero
-                    if (quantity != 0)
+                    //proceed if the quantity entered is between 1 and 99
+                    if (quantity == 0)
                     {
+                        MessageBox.Show("Please enter a nonzero quantity.");
+                        qtybox.Focus();
+                    }
+
+                    else if (quantity > 99)
+                    {
+                        MessageBox.Show("Buy limit is 99.");
+                        qtybox.Focus();
+                    }
+
+                    else
+                    {          
                         //calculate line price, add a row to the datatable, and clear the quantity textbox
                         double lineprice = Convert.ToDouble(selected_book.price) * quantity;
                         dt.Rows.Add(selected_book.title, selected_book.price, quantity.ToString(), lineprice.ToString("F"));
                         qtybox.Text = null;
-                    }
-
-                    else
-                    {
-                        MessageBox.Show("Please enter a nonzero quantity.");
-                        qtybox.Focus();
                     }
                 }
 
@@ -252,6 +261,9 @@ namespace COMPE561_Lab05
                                     MessageBox.Show("Failed to print receipt. Please contact the administrator.");
                                 }
                             }
+
+                            //clear the datatable
+                            dt.Clear();
                         }
                     }
 
