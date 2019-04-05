@@ -11,20 +11,27 @@ using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 
 /// <summary>
-/// TODO: data table specifications go here (and other 2 forms)
+/// DATABASE TABLE [book] STRUCTURE DETAILS:
+/// [title, author, isbn] columns are of type TEXT
+/// [price] column is of type DECIMAL(5,2)
 /// </summary>
 namespace COMPE561_Lab05
 {
     public partial class bookForm : Form
     {
+        Form1 f; //used to reference the main form
+
         const string connection_keycard = "datasource=127.0.0.1;port=3306;username=root;password=;database=lab5"; //"key" to the database
         const int timelim = 30; //command timeout time limit (seconds)
 
 
         //form init
-        public bookForm()
+        public bookForm(Form1 mainform)
         {
             InitializeComponent();
+
+            //create a reference to the main form
+            f = mainform;
 
             //populate the combo box
             populateDropdown();
@@ -65,7 +72,7 @@ namespace COMPE561_Lab05
             }
             else if (!RX3.IsMatch(priceBox.Text))
             {
-                MessageBox.Show("Please enter a valid amount similar to the following format: [75.00]");
+                MessageBox.Show("Please enter a valid amount similar to the following format: [75.00]\n\n**NOTE: WE DO NOT STOCK BOOKS OVER $999.99**");
                 priceBox.Focus();
                 perfectInput = false;
             }
@@ -179,10 +186,11 @@ namespace COMPE561_Lab05
         }
 
 
-        //back button: stows the current form and returns to the main menu
+        //back button: exits the current form and restores visibility to the main menu
         private void backButton_Click(object sender, EventArgs e)
         {
             Close();
+            f.Show();
         }
 
 

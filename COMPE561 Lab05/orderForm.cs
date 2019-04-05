@@ -10,12 +10,26 @@ using System.Windows.Forms;
 using MySql.Data.MySqlClient;
 using System.IO;
 
+/// <summary>
+/// DATABASE TABLE [orders] STRUCTURE DETAILS:
+/// [order_id, cust_id, date] columns are of type TEXT
+/// [subtotal] column is of type DECIMAL(7,2)
+/// [tax] column is of type DECIMAL(5,2)
+/// [total] column is of type DECIMAL(8,2)
+/// 
+/// DATABASE TABLE [order_details] STRUCTURE DETAILS:
+/// [order_id, isbn] columns are of type TEXT
+/// [qty] column is of type INT(2)
+/// [line_total] column is of type DECIMAL(7,2)
+/// </summary>
 namespace COMPE561_Lab05
 {
     public partial class orderForm : Form
     {
+        Form1 f; //used to reference the main form
+
         const string connection_keycard = "datasource=127.0.0.1;port=3306;username=root;password=;database=lab5"; //"key" to the database
-        const string dest_name = "ordersumary.txt"; //receipt file name
+        const string dest_name = "ordersummary.txt"; //receipt .txt file name
         const int timelim = 30; //command timeout time limit (seconds)
         const int idlength = 10; //order id length
         const double taxratio = 10; //tax multiplier (percent)
@@ -25,9 +39,12 @@ namespace COMPE561_Lab05
 
 
         //form init
-        public orderForm()
+        public orderForm(Form1 mainform)
         {
             InitializeComponent();
+
+            //create a reference to the main form
+            f = mainform;
 
             //populate both combo boxes
             populateDropdown1();
@@ -80,7 +97,7 @@ namespace COMPE561_Lab05
                     {
                         //calculate line price, add a row to the datatable, and clear the quantity textbox
                         double lineprice = Convert.ToDouble(selected_book.price) * quantity;
-                        dt.Rows.Add(selected_book.title, selected_book.price, quantity.ToString(), lineprice.ToString());
+                        dt.Rows.Add(selected_book.title, selected_book.price, quantity.ToString(), lineprice.ToString("F"));
                         qtybox.Text = null;
                     }
 
@@ -124,7 +141,11 @@ namespace COMPE561_Lab05
                         {
                             double subtotal = 0; //running total for subtotal calculation
                             int count = dt.Rows.Count; //total number of entries added to datatable
-                            string ordercode = gen_id(); //this order's unique id
+                            string ordercode = gen_id(); //this order's uniquely generated id
+
+                            //get today's date
+                            DateTime today = new DateTime();
+                            today = DateTime.Now;
 
                             //sum up the prices of all items in the datatable
                             for (int i = 0; i < count; i++)
@@ -137,29 +158,58 @@ namespace COMPE561_Lab05
                             double tax = (Math.Ceiling(subtotal * taxratio) / 100.0); //rounds up to 2 decimal places by dividing a whole number by 100
                             double total = subtotal + tax;
 
-                            //display all costs in their relevant textboxes
-                            subtotalbox.Text = $"${subtotal}";
-                            taxbox.Text = $"${tax}";
-                            totalbox.Text = $"${total}";
+                            //format all costs with 2 decimal points, and display them in their relevant textboxes
+                            subtotalbox.Text = $"${subtotal.ToString("F")}";
+                            taxbox.Text = $"${tax.ToString("F")}";
+                            totalbox.Text = $"${total.ToString("F")}";
 
                             //create a connection "portal" to the database using the "keycard" string
                             MySqlConnection dbPortal = new MySqlConnection(connection_keycard);
 
-                            //TODO
                             //create a command object using the "portal" object, and a SQL query that inserts a row of data into the database's "orders" table
                             string query1 = "INSERT INTO orders(order_id, cust_id, subtotal, tax, total, date) " +
-                                $"VALUES('{ordercode}', '{idbox.Text}', )";
+                                $"VALUES('{ordercode}', '{idbox.Text}', {subtotal.ToString("F")}, {tax.ToString("F")}, {total.ToString("F")}, '{today.Date.ToString("d")}');";
                             MySqlCommand command1 = new MySqlCommand(query1, dbPortal);
                             command1.CommandTimeout = timelim; //ensure the command doesn't take too long
 
-                            //TODO
-                            //create a second command object with a SQL query that inserts a row of data into the database's "order_details" table
-                            string query2 = "INSERT INTO order_details(order_id, isbn, qty, line_total) " +
-                                $"VALUES('{ordercode}', '{isbnbox.Text}', )";
+                            //open the "portal" and insert data
+                            try
+                            {
+                                dbPortal.Open();
+                                command1.ExecuteNonQuery();
+                            }
 
+                            catch (Exception err)
+                            {
+                                MessageBox.Show($"ERROR: {err.Message}");
+                                MessageBox.Show("Failed to record book information [CODE 001]. Please contact the admin.");
+                                return;
+                            }
 
+                            //create a second command object for use with several SQL queries that insert rows of data into the database's "order_details" table
+                            MySqlCommand command2;
+                            for (int i=0; i < dt.Rows.Count; i++)
+                            {
+                                string query2 = "INSERT INTO order_details(order_id, isbn, qty, line_total) " +
+                                    $"VALUES('{ordercode}', " +
+                                    $"(SELECT isbn FROM book WHERE title = '{dt.Rows[i][0]}'), " +
+                                    $"{dt.Rows[i][2]}, {dt.Rows[i][3]});";
+                                command2 = new MySqlCommand(query2, dbPortal);
+                                command2.CommandTimeout = timelim; //ensure the command doesn't take too long
 
+                                //insert data using the already open "portal"
+                                try
+                                {
+                                    command2.ExecuteNonQuery();
+                                }
 
+                                catch (Exception err)
+                                {
+                                    MessageBox.Show($"ERROR: {err.Message}");
+                                    MessageBox.Show("Failed to record book information [CODE 002]. Please contact the admin.");
+                                    return;
+                                }
+                            }                           
 
                             //confirm success and ask if a receipt is desired
                             MessageBox.Show("Order successfully placed!");
@@ -173,12 +223,27 @@ namespace COMPE561_Lab05
                                     FileStream destination = new FileStream(dest_name, FileMode.Create, FileAccess.Write);
                                     StreamWriter print_tool = new StreamWriter(destination);
 
-                                    //TODO
-                                    print_tool.WriteLine($"*******END OF ORDER SUMMARY*******");
+                                    print_tool.WriteLine("*****ORDER SUMMARY*****");
+                                    print_tool.WriteLine("");
+                                    print_tool.WriteLine($"CUSTOMER: {custselDropdown.SelectedItem}");
+                                    print_tool.WriteLine($"ID: {idbox.Text}");
+                                    print_tool.WriteLine($"ORDER NUMBER: {ordercode}");
+                                    print_tool.WriteLine($"DATE: {today.Date.ToString("d")}");
+                                    print_tool.WriteLine("");
+                                    for (int j = 0; j < dt.Rows.Count; j++)
+                                    {
+                                        print_tool.WriteLine($"-----{dt.Rows[j][0]} (${dt.Rows[j][1]})  *{dt.Rows[j][2]}   =   ${dt.Rows[j][3]}");
+                                    }
+                                    print_tool.WriteLine("");
+                                    print_tool.WriteLine($"SUBTOTAL: {subtotalbox.Text}");
+                                    print_tool.WriteLine($"TAX: {taxbox.Text}");
+                                    print_tool.WriteLine($"TOTAL: {totalbox.Text}");
+                                    print_tool.WriteLine("");
+                                    print_tool.WriteLine("*******THANK YOU*******");
 
                                     print_tool.Close();
                                     destination.Close();
-                                    MessageBox.Show("Receipt successfully created.");
+                                    MessageBox.Show("Receipt successfully printed. Thank you for shopping.");
                                 }
 
                                 catch (Exception err)
@@ -198,10 +263,9 @@ namespace COMPE561_Lab05
                 }
             }
 
-            catch (IndexOutOfRangeException err)
+            catch
             {
-                MessageBox.Show($"ERROR: {err.Message}");
-                MessageBox.Show("Failed to record checkout details. Please contact the administrator.");
+                MessageBox.Show("Please add items to your cart before attempting to place an order.");
             }
         }
 
@@ -214,10 +278,11 @@ namespace COMPE561_Lab05
         }
 
 
-        //back button: stows the current form and returns to the main menu
+        //back button: exits the current form and restores visibility to the main menu
         private void backButton_Click(object sender, EventArgs e)
         {
             Close();
+            f.Show();
         }
 
 
@@ -359,15 +424,6 @@ namespace COMPE561_Lab05
         }
 
 
-        /*
-        //generates a random date
-        private string gen_date()
-        {
-            Random RNGesus = new Random();
-        }
-        */
-
-
         //clears the form
         private void reset()
         {
@@ -387,7 +443,3 @@ namespace COMPE561_Lab05
         }
     }
 }
-
-//TODO: generate or get date
-//finish database-write functionality (the second database table accounts for each row in the shopping cart)
-//EC: write order summary to notepad

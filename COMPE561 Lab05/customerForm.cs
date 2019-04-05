@@ -11,19 +11,28 @@ using System.IO;
 using System.Text.RegularExpressions;
 using MySql.Data.MySqlClient;
 
+/// <summary>
+/// DATABASE TABLE [customer] STRUCTURE DETAILS:
+/// ALL columns are of type TEXT
+/// </summary>
 namespace COMPE561_Lab05
 {
     public partial class customerForm : Form
     {
+        Form1 f; //used to reference the main form
+
         const string connection_keycard = "datasource=127.0.0.1;port=3306;username=root;password=;database=lab5"; //"key" to the database
         const int timelim = 30; //command timeout time limit (seconds)
         const int idlength = 6; //customer id length
-
+        
 
         //form init
-        public customerForm()
+        public customerForm(Form1 mainform)
         {
             InitializeComponent();
+
+            //create a reference to the main form
+            f = mainform;
 
             //populate the combo box
             populateDropdown();
@@ -222,10 +231,11 @@ namespace COMPE561_Lab05
         }
 
 
-        //back button: stows the current form and returns to the main menu
+        //back button: exits the current form and restores visibility to the main menu
         private void backButton_Click(object sender, EventArgs e)
         {
             Close();
+            f.Show();
         }
 
 

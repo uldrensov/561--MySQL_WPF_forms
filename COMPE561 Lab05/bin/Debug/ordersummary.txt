@@ -1,0 +1,16 @@
+*****ORDER SUMMARY*****
+
+CUSTOMER: William Phan
+ID: 744430
+ORDER NUMBER: 7793495987
+DATE: 4/4/2019
+
+-----Vietnamese Heritage ($6.00)  *2   =   $12.00
+-----Oceanography ($9.99)  *1   =   $9.99
+-----Boontean Boology ($0.10)  *1   =   $0.10
+
+SUBTOTAL: $22.09
+TAX: $2.21
+TOTAL: $24.30
+
+*******THANK YOU*******

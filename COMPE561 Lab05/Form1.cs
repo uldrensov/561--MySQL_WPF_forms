@@ -8,6 +8,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
+/// <summary>
+/// Cliff Phan (821099130)
+/// SQL Bookstore application
+/// Allows the user interact with a database to add/modify customer and book entries, and place orders as a registered customer
+/// </summary>
 namespace COMPE561_Lab05
 {
     public partial class Form1 : Form
@@ -25,33 +30,30 @@ namespace COMPE561_Lab05
         }
 
 
-        //customers button:
+        //customers button: hides the main form and reveals a newly created customerForm
         private void custSwitch_Click(object sender, EventArgs e)
         {
-            customerForm f = new customerForm();
+            customerForm f = new customerForm(this); //pass this form instance as an argument, so it can be manipulated from the customerForm
+            Hide();
             f.Show();
-            //Hide();
         }
 
 
-        //books button:
+        //books button: hides the main form and reveals a newly created bookForm
         private void bookSwitch_Click(object sender, EventArgs e)
         {
-            bookForm g = new bookForm();
+            bookForm g = new bookForm(this); //pass this form instance as an argument, so it can be manipulated from the bookForm
+            Hide();
             g.Show();
-            //Hide();
         }
 
 
-        //order button:
+        //order button: hides the main form and reveals a newly created orderForm
         private void orderSwitch_Click(object sender, EventArgs e)
         {
-            orderForm h = new orderForm();
+            orderForm h = new orderForm(this); //pass this form instance as an argument, so it can be manipulated from the orderForm
+            Hide();
             h.Show();
-            //Hide();
         }
     }
 }
-
-//TODO: buttons can be pressed multiple times to create multiple forms...fix it or simply hide the form?
-// implement form-switch features for all other forms
